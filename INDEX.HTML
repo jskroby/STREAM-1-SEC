@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Real-Time BTC/USDT Data</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    #data {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+  <h1>Real-Time BTC/USDT Trade Data</h1>
+  <div id="data">Waiting for data...</div>
+
+  <script>
+    // WebSocket URL for Binance's BTC/USDT real-time trades
+    const url = "wss://stream.binance.com:9443/ws/btcusdt@trade";
+
+    // Connect to the WebSocket
+    const socket = new WebSocket(url);
+
+    // When the WebSocket opens, log the connection
+    socket.onopen = () => {
+      console.log("Connected to WebSocket.");
+    };
+
+    // Listen for messages (real-time trade data)
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      // Extract price and quantity from the trade data
+      const price = data.p;
+      const quantity = data.q;
+      const timestamp = new Date(data.T);
+
+      // Update the HTML with new trade data
+      document.getElementById("data").innerHTML = `
+        <strong>Price:</strong> $${price}<br>
+        <strong>Quantity:</strong> ${quantity} BTC<br>
+        <strong>Timestamp:</strong> ${timestamp.toISOString()}
+      `;
+    };
+
+    // Handle errors
+    socket.onerror = (error) => {
+      console.error("WebSocket Error: ", error);
+    };
+
+    // Handle WebSocket closure
+    socket.onclose = () => {
+      console.log("WebSocket closed.");
+    };
+  </script>
+</body>
+</html>
